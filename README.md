@@ -1,77 +1,80 @@
 # Solis Shelly SDM630 Bridge
 
-Gebruik een Shelly Pro 3EM als netmeter voor een Solis S6 omvormer die normaal een Eastron SDM630MCT via Modbus RTU verwacht.
+Use a Shelly Pro 3EM as the grid meter for a Solis S6 inverter that normally expects an Eastron SDM630MCT over Modbus RTU.
 
-De bridge draait op een KinCony ESP32-S3 Core Board. De ESP leest de Shelly via HTTP/RPC en gedraagt zich richting de Solis als een Eastron/SDM630 Modbus RTU slave op RS485.
+The bridge runs on a KinCony ESP32-S3 Core Board. The ESP reads the Shelly over HTTP/RPC and presents itself to the Solis inverter as an Eastron/SDM630 Modbus RTU slave over RS485.
 
-![Systeemoverzicht](assets/system-overview.svg)
+![System overview](assets/system-overview.svg)
 
 ## Status
 
-Getest met:
+Tested with:
 
-- Solis S6 omvormer met meterpoort voor Eastron/SDM630
-- Shelly Pro 3EM / EM3 met RPC endpoints
-- KinCony ESP32-S3 Core Board met onboard W5500 Ethernet en RS485
+- Solis S6 inverter with an Eastron/SDM630 meter port
+- Shelly Pro 3EM / EM3 with RPC endpoints
+- KinCony ESP32-S3 Core Board with onboard W5500 Ethernet and RS485
 - ESPHome 2026.4.x
 
-## Wat je nodig hebt
+## Hardware
 
 - KinCony ESP32-S3 Core Board
-- 12 V voeding voor de KinCony
-- Shelly Pro 3EM of compatibele Shelly Gen2/Gen3 energiemeter
-- Netwerkkabel voor Ethernet
-- RJ45-stekker of kabel naar de Solis meterpoort
+- 12 V power supply for the KinCony
+- Shelly Pro 3EM or compatible Shelly Gen2/Gen3 energy meter
+- Ethernet cable
+- RJ45 plug or cable for the Solis meter port
+- The meter-port cable supplied with the Solis inverter can be reused
 - ESPHome Device Builder
 
-## Aansluiten
+## Wiring
 
-Gebruik de onboard RS485 van de KinCony naar de Solis meterpoort.
+Use the onboard RS485 terminal on the KinCony and connect it to the Solis meter port.
 
-![Aansluitschema](assets/wiring-kincony-solis.svg)
+![Wiring diagram](assets/wiring-kincony-solis.svg)
 
-| KinCony onboard RS485 | Solis meter RJ45 | Functie |
+| KinCony onboard RS485 | Solis meter RJ45 | Function |
 | --- | --- | --- |
 | 485A | Pin 1 | RS485 A |
 | 485B | Pin 2 | RS485 B |
-| GND | Alleen indien beschikbaar | Referentie, meestal niet nodig |
+| GND | Only if available | Reference, usually not required |
 
-Als de Solis geen meter ziet: wissel A en B om. RS485-labels zijn helaas niet overal consequent.
+If you have the original Solis meter cable, plug the RJ45 side into the Solis meter port and connect the RS485 A/B wires on the other end to the KinCony. Check continuity to identify pin 1 and pin 2 if the wire colors are unclear.
 
-## Snelle installatie
+If the Solis inverter does not detect a meter, swap A and B. RS485 labels are not always consistent across devices.
 
-1. Reserveer via DHCP een vast IP voor de Shelly en eventueel voor de KinCony.
-2. Kopieer `esphome/solis-sdm630-bridge.yaml` naar ESPHome.
-3. Pas bovenin de YAML `shelly_host` aan naar het IP of hostname van jouw Shelly.
-4. Flash de KinCony de eerste keer via USB.
-5. Verbind KinCony RS485 met de Solis meterpoort.
-6. Stel op de Solis de meter in als Eastron/SDM630, Modbus adres `1`, `9600 8N1`.
-7. Controleer in ESPHome logs of de Shelly-data elke seconde binnenkomt.
-8. Controleer op de Solis of meter/grid waarden zichtbaar zijn.
+## Quick Start
 
-Meer detail staat in [docs/installatie.md](docs/installatie.md).
+1. Create DHCP reservations for the Shelly and, optionally, the KinCony.
+2. Copy `esphome/solis-sdm630-bridge.yaml` into ESPHome.
+3. Change `shelly_host` at the top of the YAML to your Shelly IP or hostname.
+4. Flash the KinCony over USB for the first install.
+5. Connect the KinCony RS485 terminal to the Solis meter port.
+6. Configure the Solis meter as Eastron/SDM630, Modbus address `1`, `9600 8N1`.
+7. Check the ESPHome logs and confirm Shelly values arrive every second.
+8. Check the Solis display for live meter/grid values.
 
-## ESPHome configuratie
+More detail is available in [docs/installation.md](docs/installation.md).
 
-De complete voorbeeldconfig staat hier:
+## ESPHome Configuration
+
+The complete example configuration is here:
 
 - [esphome/solis-sdm630-bridge.yaml](esphome/solis-sdm630-bridge.yaml)
 
-Belangrijke instellingen:
+Important settings:
 
-- Modbus slave adres: `1`
+- Modbus slave address: `1`
 - Baudrate: `9600`
-- UART: `GPIO16` TX en `GPIO15` RX voor de onboard RS485 van de KinCony
-- DHCP: er staat geen static IP in de YAML
-- Shelly polling: elke seconde via `/rpc/EM.GetStatus?id=0`
+- UART: `GPIO16` TX and `GPIO15` RX for the KinCony onboard RS485
+- DHCP: no static IP is configured in the YAML
+- Shelly polling: once per second through `/rpc/EM.GetStatus?id=0`
 
-## Veiligheid
+## Safety
 
-Werk niet aan bekabeling terwijl de omvormer of meterkast onder spanning staat. RS485 is laagspanning, maar de meter/CT-installatie zit in de buurt van netspanning. Laat de netspanningskant door een bevoegd persoon controleren.
+Do not work on wiring while the inverter or electrical cabinet is energized. RS485 is low voltage, but the meter and CT wiring are close to mains voltage. Have the mains side checked by a qualified person.
 
-## Documentatie
+## Documentation
 
-- [Installatiehandleiding](docs/installatie.md)
+- [Installation guide](docs/installation.md)
 - [Troubleshooting](docs/troubleshooting.md)
-- [Registermapping](docs/registermapping.md)
+- [Register mapping](docs/register-mapping.md)
 - [RJ45 pinout](assets/rj45-meter-pinout.svg)

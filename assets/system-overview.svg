@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="360" viewBox="0 0 1080 360" role="img" aria-labelledby="title desc">
-  <title id="title">Solis Shelly SDM630 bridge systeemoverzicht</title>
-  <desc id="desc">Shelly energiemeter stuurt data naar KinCony ESPHome bridge; de bridge emuleert een Eastron SDM630 meter via RS485 richting Solis.</desc>
+  <title id="title">Solis Shelly SDM630 bridge system overview</title>
+  <desc id="desc">Shelly energy meter sends data to the KinCony ESPHome bridge; the bridge emulates an Eastron SDM630 meter over RS485 for the Solis inverter.</desc>
   <defs>
     <style>
       .bg{fill:#f7f8fa}
@@ -21,7 +21,7 @@
   <rect class="bg" x="0" y="0" width="1080" height="360"/>
   <rect class="box" x="40" y="95" width="250" height="150"/>
   <text class="title" x="70" y="145">Shelly Pro 3EM</text>
-  <text class="small" x="70" y="180">Meet netverbruik</text>
+  <text class="small" x="70" y="180">Measures grid power</text>
   <text class="small" x="70" y="207">HTTP RPC endpoints</text>
   <rect class="box" x="415" y="80" width="250" height="180"/>
   <text class="title" x="445" y="130">KinCony ESP32-S3</text>
@@ -30,8 +30,8 @@
   <text class="small" x="445" y="219">Modbus RTU slave</text>
   <rect class="box" x="790" y="95" width="250" height="150"/>
   <text class="title" x="820" y="145">Solis S6</text>
-  <text class="small" x="820" y="180">Meterpoort</text>
-  <text class="small" x="820" y="207">Leest SDM630 registers</text>
+  <text class="small" x="820" y="180">Meter port</text>
+  <text class="small" x="820" y="207">Reads SDM630 registers</text>
   <path class="arrow" d="M292 170 H410"/>
   <text class="muted" x="315" y="145">Ethernet</text>
   <text class="muted" x="318" y="195">HTTP/RPC</text>
@@ -39,4 +39,3 @@
   <text class="muted" x="700" y="145">RS485</text>
   <text class="muted" x="690" y="195">Modbus RTU</text>
 </svg>
-

@@ -1,53 +1,54 @@
 # Troubleshooting
 
-## ESPHome ziet de Shelly niet
+## ESPHome Cannot Reach the Shelly
 
-Controleer:
+Check:
 
-- `shelly_host` in de YAML
-- Shelly en KinCony zitten in hetzelfde routable netwerk
-- De Shelly RPC URL werkt in een browser
-- Geen firewall tussen ESP en Shelly
+- `shelly_host` in the YAML
+- Shelly and KinCony are in the same routable network
+- The Shelly RPC URL works in a browser
+- No firewall blocks traffic between ESP and Shelly
 
-## OTA upload lukt niet via `.local`
+## OTA Upload Does Not Work Through `.local`
 
-Gebruik DHCP-reservations. Als mDNS faalt, voeg tijdelijk toe onder `ethernet`:
+Use DHCP reservations. If mDNS fails, temporarily add this under `ethernet`:
 
 ```yaml
   use_address: KINCONY_DHCP_IP
 ```
 
-Gebruik hier het DHCP-adres van de KinCony. Dit is geen static IP-configuratie voor het device; ESPHome gebruikt het alleen om OTA/logs te vinden.
+Use the DHCP address of the KinCony. This is not a static IP configuration for the device; ESPHome only uses it to find the device for OTA and logs.
 
-## Solis ziet geen meter
+## Solis Does Not Detect a Meter
 
-Controleer:
+Check:
 
-- Solis staat op Eastron/SDM630 meter
-- Modbus adres is `1`
+- Solis is configured for an Eastron/SDM630 meter
+- Modbus address is `1`
 - Baudrate is `9600`
-- KinCony 485A naar Solis RJ45 pin 1
-- KinCony 485B naar Solis RJ45 pin 2
-- Wissel A/B als er geen meter wordt gevonden
+- KinCony 485A goes to Solis RJ45 pin 1
+- KinCony 485B goes to Solis RJ45 pin 2
+- If using the original Solis meter cable, verify which wires go to RJ45 pin 1 and pin 2
+- Swap A/B if no meter is detected
 
-## Waarden hebben de verkeerde richting
+## Values Have the Wrong Direction
 
-Als import/export omgekeerd lijkt:
+If import/export appears reversed:
 
-- Controleer de richting van de Shelly CT-klemmen
-- Controleer de fasevolgorde
-- Controleer in de Shelly app of vermogen positief/negatief logisch is
+- Check the direction of the Shelly CT clamps
+- Check phase order
+- Check in the Shelly app whether positive/negative power makes sense
 
-Pas de ESPHome-code pas aan nadat de Shelly zelf logisch meet.
+Only change the ESPHome code after the Shelly itself measures logically.
 
-## Home Assistant of SolisCloud loopt achter
+## Home Assistant or SolisCloud Lags Behind
 
-De ESP leest de Shelly elke seconde. SolisCloud/Home Assistant integraties kunnen veel trager verversen. Gebruik voor live controle:
+The ESP reads the Shelly every second. SolisCloud/Home Assistant integrations may refresh much more slowly. For live checks, use:
 
 - ESPHome logs
 - Solis display
-- Webserver van de KinCony
+- KinCony web server
 
-## ESPHome logs via dashboard
+## ESPHome Logs Through the Dashboard
 
-Kies bij logs voor OTA/wireless. Bij API-gebruik moet ESPHome de configuratie en target `OTA` gebruiken.
+Choose OTA/wireless when opening logs. When using the ESPHome API directly, the log request must include the configuration and target `OTA`.

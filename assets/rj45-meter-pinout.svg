@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360" role="img" aria-labelledby="title desc">
   <title id="title">Solis RJ45 meter pinout</title>
-  <desc id="desc">RJ45 meterconnector met pin 1 als RS485 A en pin 2 als RS485 B.</desc>
+  <desc id="desc">RJ45 meter connector with pin 1 as RS485 A and pin 2 as RS485 B.</desc>
   <defs>
     <style>
       .bg{fill:#f7f8fa}
@@ -14,8 +14,8 @@
     </style>
   </defs>
   <rect class="bg" x="0" y="0" width="900" height="360"/>
-  <text class="title" x="40" y="48">Solis meterpoort RJ45 pinout</text>
-  <text class="small" x="40" y="78">Vooraanzicht op de stekkercontacten. Controleer altijd je eigen Solis handleiding.</text>
+  <text class="title" x="40" y="48">Solis meter port RJ45 pinout</text>
+  <text class="small" x="40" y="78">Front view of the plug contacts. Always check your own Solis manual.</text>
   <rect class="plug" x="170" y="120" width="560" height="120"/>
   <rect class="pin pin1" x="195" y="145" width="55" height="70"/>
   <rect class="pin pin2" x="260" y="145" width="55" height="70"/>
@@ -36,4 +36,3 @@
   <text class="label" x="185" y="315">Pin 1: RS485 A</text>
   <text class="label" x="405" y="315">Pin 2: RS485 B</text>
 </svg>
-
