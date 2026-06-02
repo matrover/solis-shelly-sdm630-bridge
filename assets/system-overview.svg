@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="360" viewBox="0 0 1080 360" role="img" aria-labelledby="title desc">
+  <title id="title">Solis Shelly SDM630 bridge systeemoverzicht</title>
+  <desc id="desc">Shelly energiemeter stuurt data naar KinCony ESPHome bridge; de bridge emuleert een Eastron SDM630 meter via RS485 richting Solis.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f7f8fa}
+      .box{fill:#fff;stroke:#202632;stroke-width:2;rx:10}
+      .muted{fill:#5f6b7a;font:18px Arial,sans-serif}
+      .title{fill:#111827;font:bold 24px Arial,sans-serif}
+      .small{fill:#374151;font:16px Arial,sans-serif}
+      .arrow{stroke:#2563eb;stroke-width:4;fill:none;marker-end:url(#arrow)}
+      .rs485{stroke:#059669;stroke-width:4;fill:none;marker-end:url(#arrow-green)}
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1080" height="360"/>
+  <rect class="box" x="40" y="95" width="250" height="150"/>
+  <text class="title" x="70" y="145">Shelly Pro 3EM</text>
+  <text class="small" x="70" y="180">Meet netverbruik</text>
+  <text class="small" x="70" y="207">HTTP RPC endpoints</text>
+  <rect class="box" x="415" y="80" width="250" height="180"/>
+  <text class="title" x="445" y="130">KinCony ESP32-S3</text>
+  <text class="small" x="445" y="165">ESPHome</text>
+  <text class="small" x="445" y="192">Fake Eastron SDM630</text>
+  <text class="small" x="445" y="219">Modbus RTU slave</text>
+  <rect class="box" x="790" y="95" width="250" height="150"/>
+  <text class="title" x="820" y="145">Solis S6</text>
+  <text class="small" x="820" y="180">Meterpoort</text>
+  <text class="small" x="820" y="207">Leest SDM630 registers</text>
+  <path class="arrow" d="M292 170 H410"/>
+  <text class="muted" x="315" y="145">Ethernet</text>
+  <text class="muted" x="318" y="195">HTTP/RPC</text>
+  <path class="rs485" d="M668 170 H786"/>
+  <text class="muted" x="700" y="145">RS485</text>
+  <text class="muted" x="690" y="195">Modbus RTU</text>
+</svg>
+

@@ -1,0 +1,268 @@
+substitutions:
+  name: solis-sdm630-bridge
+  friendly_name: Solis SDM630 Bridge
+  shelly_host: shelly-pro-3em.local
+  modbus_slave_address: "1"
+  power_offset_w: "0.0"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  comment: "Shelly Pro 3EM to fake Eastron SDM630 Modbus RTU bridge for Solis"
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: arduino
+
+logger:
+  level: INFO
+
+api:
+  # Optional:
+  # encryption:
+  #   key: !secret esphome_api_key
+
+ota:
+  - platform: esphome
+  - platform: web_server
+
+web_server:
+  port: 80
+  version: 3
+  include_internal: false
+
+ethernet:
+  type: W5500
+  clk_pin: GPIO43
+  mosi_pin: GPIO44
+  miso_pin: GPIO42
+  cs_pin: GPIO41
+  interrupt_pin: GPIO2
+  reset_pin: GPIO1
+  # Optional fallback for OTA/logs if mDNS fails:
+  # use_address: KINCONY_DHCP_IP
+
+external_components:
+  - source: "github://hankipanky/esphome-fake-eastron-SDM630"
+    refresh: 1d
+    components:
+      - modbus_server
+
+uart:
+  - id: rs485_uart
+    tx_pin: GPIO16
+    rx_pin: GPIO15
+    baud_rate: 9600
+    stop_bits: 1
+    data_bits: 8
+    parity: NONE
+
+http_request:
+  id: http_request_data
+  useragent: esphome/solis-sdm630-bridge
+  timeout: 3s
+  verify_ssl: false
+
+modbus_server:
+  - id: modbusserver
+    uart_id: rs485_uart
+    address: ${modbus_slave_address}
+    input_registers:
+      - start_address: 0
+        default: 0
+        number: 72
+        on_read: |-
+          ESP_LOGD("read-modbus", "Returning register address=%d, value=0x%04x", address, value);
+          return value;
+      - start_address: 200
+        default: 0
+        number: 6
+        on_read: |-
+          ESP_LOGD("read-modbus", "Returning register address=%d, value=0x%04x", address, value);
+          return value;
+      - start_address: 342
+        default: 0
+        number: 2
+        on_read: |-
+          ESP_LOGD("read-modbus", "Returning register address=%d, value=0x%04x", address, value);
+          return value;
+
+binary_sensor:
+  - platform: template
+    id: shelly_em_online
+    name: Shelly EM Online
+    device_class: connectivity
+
+sensor:
+  - platform: uptime
+    name: Uptime
+  - platform: template
+    id: shelly_phase_a_power
+    name: Shelly Phase A Power
+    unit_of_measurement: W
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+  - platform: template
+    id: shelly_phase_b_power
+    name: Shelly Phase B Power
+    unit_of_measurement: W
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+  - platform: template
+    id: shelly_phase_c_power
+    name: Shelly Phase C Power
+    unit_of_measurement: W
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+  - platform: template
+    id: shelly_total_active_power
+    name: Shelly Total Active Power
+    unit_of_measurement: W
+    device_class: power
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+  - platform: template
+    id: shelly_total_apparent_power
+    name: Shelly Total Apparent Power
+    unit_of_measurement: VA
+    device_class: apparent_power
+    state_class: measurement
+    accuracy_decimals: 1
+    update_interval: never
+  - platform: template
+    id: shelly_total_energy
+    name: Shelly Total Energy
+    unit_of_measurement: kWh
+    device_class: energy
+    state_class: total_increasing
+    accuracy_decimals: 3
+    update_interval: never
+
+interval:
+  - interval: 1s
+    then:
+      - http_request.get:
+          url: !lambda |-
+            return ((std::string) "http://${shelly_host}/rpc/EM.GetStatus?id=0");
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code != 200) {
+                    id(shelly_em_online).publish_state(false);
+                    ESP_LOGW("shelly", "EM.GetStatus returned HTTP status %d", response->status_code);
+                    return;
+                  }
+
+                  const bool ok = json::parse_json(body, [](JsonObject root) -> bool {
+                    union {
+                      uint16_t x_int[2];
+                      float x_f;
+                    } u;
+
+                    auto write_float = [&](uint16_t reg, float value) {
+                      u.x_f = value;
+                      id(modbusserver)->write_input_register(reg, u.x_int[1]);
+                      id(modbusserver)->write_input_register(reg + 1, u.x_int[0]);
+                    };
+
+                    const float power_offset = ${power_offset_w};
+                    const float a_act_power = root["a_act_power"] | 0.0f;
+                    const float b_act_power = root["b_act_power"] | 0.0f;
+                    const float c_act_power = root["c_act_power"] | 0.0f;
+                    const float a_aprt_power = root["a_aprt_power"] | 0.0f;
+                    const float b_aprt_power = root["b_aprt_power"] | 0.0f;
+                    const float c_aprt_power = root["c_aprt_power"] | 0.0f;
+                    const float total_act_power = root["total_act_power"] | 0.0f;
+                    const float total_aprt_power = root["total_aprt_power"] | 0.0f;
+
+                    id(shelly_em_online).publish_state(true);
+                    id(shelly_phase_a_power).publish_state(a_act_power);
+                    id(shelly_phase_b_power).publish_state(b_act_power);
+                    id(shelly_phase_c_power).publish_state(c_act_power);
+                    id(shelly_total_active_power).publish_state(total_act_power);
+                    id(shelly_total_apparent_power).publish_state(total_aprt_power);
+
+                    write_float(0, root["a_voltage"] | 0.0f);
+                    write_float(2, root["b_voltage"] | 0.0f);
+                    write_float(4, root["c_voltage"] | 0.0f);
+                    write_float(6, root["a_current"] | 0.0f);
+                    write_float(8, root["b_current"] | 0.0f);
+                    write_float(10, root["c_current"] | 0.0f);
+                    write_float(12, a_act_power - power_offset);
+                    write_float(14, b_act_power - power_offset);
+                    write_float(16, c_act_power - power_offset);
+                    write_float(18, a_aprt_power - power_offset);
+                    write_float(20, b_aprt_power - power_offset);
+                    write_float(22, c_aprt_power - power_offset);
+                    write_float(30, a_aprt_power != 0.0f ? a_act_power / a_aprt_power : 0.0f);
+                    write_float(32, b_aprt_power != 0.0f ? b_act_power / b_aprt_power : 0.0f);
+                    write_float(34, c_aprt_power != 0.0f ? c_act_power / c_aprt_power : 0.0f);
+                    write_float(48, root["total_current"] | 0.0f);
+                    write_float(52, total_act_power);
+                    write_float(56, total_aprt_power);
+                    write_float(70, root["a_freq"] | 50.0f);
+                    return true;
+                  });
+
+                  if (!ok) {
+                    id(shelly_em_online).publish_state(false);
+                    ESP_LOGW("shelly", "Could not parse EM.GetStatus JSON response");
+                  }
+          on_error:
+            then:
+              - lambda: |-
+                  id(shelly_em_online).publish_state(false);
+                  ESP_LOGW("shelly", "EM.GetStatus request failed");
+      - http_request.get:
+          url: !lambda |-
+            return ((std::string) "http://${shelly_host}/rpc/EMData.GetStatus?id=0");
+          capture_response: true
+          on_response:
+            then:
+              - lambda: |-
+                  if (response->status_code != 200) {
+                    ESP_LOGW("shelly", "EMData.GetStatus returned HTTP status %d", response->status_code);
+                    return;
+                  }
+
+                  const bool ok = json::parse_json(body, [](JsonObject root) -> bool {
+                    union {
+                      uint16_t x_int[2];
+                      float x_f;
+                    } u;
+
+                    const float total_act = root["total_act"] | 0.0f;
+                    id(shelly_total_energy).publish_state(total_act / 1000.0f);
+                    u.x_f = total_act;
+                    id(modbusserver)->write_input_register(342, u.x_int[1]);
+                    id(modbusserver)->write_input_register(343, u.x_int[0]);
+                    return true;
+                  });
+
+                  if (!ok) {
+                    ESP_LOGW("shelly", "Could not parse EMData.GetStatus JSON response");
+                  }
+          on_error:
+            then:
+              - lambda: |-
+                  ESP_LOGW("shelly", "EMData.GetStatus request failed");
+
+text_sensor:
+  - platform: ethernet_info
+    ip_address:
+      name: IP Address
+  - platform: version
+    name: ESPHome Version
+
+button:
+  - platform: restart
+    name: Restart

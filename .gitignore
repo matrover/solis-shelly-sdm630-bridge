@@ -1,0 +1,11 @@
+.esphome/
+.pioenvs/
+.piolibdeps/
+.vscode/
+data/
+secrets.yaml
+*.bin
+*.elf
+*.log
+*.tmp
+
