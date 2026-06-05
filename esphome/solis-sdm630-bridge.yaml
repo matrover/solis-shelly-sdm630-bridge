@@ -4,6 +4,7 @@ substitutions:
   shelly_host: shelly-pro-3em.local
   modbus_slave_address: "1"
   power_offset_w: "0.0"
+  solis_meter_power_sign: "-1.0"
 
 esphome:
   name: ${name}
@@ -175,6 +176,7 @@ interval:
                     };
 
                     const float power_offset = ${power_offset_w};
+                    const float solis_meter_power_sign = ${solis_meter_power_sign};
                     const float a_act_power = root["a_act_power"] | 0.0f;
                     const float b_act_power = root["b_act_power"] | 0.0f;
                     const float c_act_power = root["c_act_power"] | 0.0f;
@@ -183,6 +185,10 @@ interval:
                     const float c_aprt_power = root["c_aprt_power"] | 0.0f;
                     const float total_act_power = root["total_act_power"] | 0.0f;
                     const float total_aprt_power = root["total_aprt_power"] | 0.0f;
+                    const float solis_a_act_power = solis_meter_power_sign * (a_act_power - power_offset);
+                    const float solis_b_act_power = solis_meter_power_sign * (b_act_power - power_offset);
+                    const float solis_c_act_power = solis_meter_power_sign * (c_act_power - power_offset);
+                    const float solis_total_act_power = solis_meter_power_sign * total_act_power;
 
                     id(shelly_em_online).publish_state(true);
                     id(shelly_phase_a_power).publish_state(a_act_power);
@@ -197,17 +203,17 @@ interval:
                     write_float(6, root["a_current"] | 0.0f);
                     write_float(8, root["b_current"] | 0.0f);
                     write_float(10, root["c_current"] | 0.0f);
-                    write_float(12, a_act_power - power_offset);
-                    write_float(14, b_act_power - power_offset);
-                    write_float(16, c_act_power - power_offset);
+                    write_float(12, solis_a_act_power);
+                    write_float(14, solis_b_act_power);
+                    write_float(16, solis_c_act_power);
                     write_float(18, a_aprt_power - power_offset);
                     write_float(20, b_aprt_power - power_offset);
                     write_float(22, c_aprt_power - power_offset);
-                    write_float(30, a_aprt_power != 0.0f ? a_act_power / a_aprt_power : 0.0f);
-                    write_float(32, b_aprt_power != 0.0f ? b_act_power / b_aprt_power : 0.0f);
-                    write_float(34, c_aprt_power != 0.0f ? c_act_power / c_aprt_power : 0.0f);
+                    write_float(30, a_aprt_power != 0.0f ? solis_a_act_power / a_aprt_power : 0.0f);
+                    write_float(32, b_aprt_power != 0.0f ? solis_b_act_power / b_aprt_power : 0.0f);
+                    write_float(34, c_aprt_power != 0.0f ? solis_c_act_power / c_aprt_power : 0.0f);
                     write_float(48, root["total_current"] | 0.0f);
-                    write_float(52, total_act_power);
+                    write_float(52, solis_total_act_power);
                     write_float(56, total_aprt_power);
                     write_float(70, root["a_freq"] | 50.0f);
                     return true;
