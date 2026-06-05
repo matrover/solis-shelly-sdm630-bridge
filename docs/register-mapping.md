@@ -25,8 +25,10 @@ All floats are written as two Modbus input registers in SDM630 byte/word order.
 | 52 | Total active power |
 | 56 | Total apparent power |
 | 70 | Frequency |
-| 72 | Total import active energy |
-| 74 | Total export active energy |
+| 72 | Solis-facing total active energy from grid |
+| 74 | Solis-facing total active energy to grid |
 | 342 | Total energy |
 
 The current YAML uses Shelly RPC fields such as `a_act_power`, `b_act_power`, `c_act_power`, `total_act_power`, `a_voltage`, `a_current`, `total_act` and `total_act_ret`.
+
+For the Solis meter path, registers 72 and 74 are intentionally written in the direction that makes the Solis-reported `from_grid` and `to_grid` totals match Shelly/P1 import and export naming.

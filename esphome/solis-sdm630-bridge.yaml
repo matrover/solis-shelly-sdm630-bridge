@@ -255,8 +255,8 @@ interval:
                     const float total_act_kwh = (root["total_act"] | 0.0f) / 1000.0f;
                     const float total_act_ret_kwh = (root["total_act_ret"] | 0.0f) / 1000.0f;
                     id(shelly_total_energy).publish_state(total_act_kwh);
-                    write_float(72, total_act_kwh);
-                    write_float(74, total_act_ret_kwh);
+                    write_float(72, total_act_ret_kwh);
+                    write_float(74, total_act_kwh);
                     write_float(342, total_act_kwh);
                     return true;
                   });
