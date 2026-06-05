@@ -25,7 +25,8 @@ All floats are written as two Modbus input registers in SDM630 byte/word order.
 | 52 | Total active power |
 | 56 | Total apparent power |
 | 70 | Frequency |
+| 72 | Total import active energy |
+| 74 | Total export active energy |
 | 342 | Total energy |
 
-The current YAML uses Shelly RPC fields such as `a_act_power`, `b_act_power`, `c_act_power`, `total_act_power`, `a_voltage`, `a_current` and `total_act`.
-
+The current YAML uses Shelly RPC fields such as `a_act_power`, `b_act_power`, `c_act_power`, `total_act_power`, `a_voltage`, `a_current`, `total_act` and `total_act_ret`.

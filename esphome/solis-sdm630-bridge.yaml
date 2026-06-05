@@ -72,7 +72,7 @@ modbus_server:
     input_registers:
       - start_address: 0
         default: 0
-        number: 72
+        number: 76
         on_read: |-
           ESP_LOGD("read-modbus", "Returning register address=%d, value=0x%04x", address, value);
           return value;
@@ -246,11 +246,18 @@ interval:
                       float x_f;
                     } u;
 
-                    const float total_act = root["total_act"] | 0.0f;
-                    id(shelly_total_energy).publish_state(total_act / 1000.0f);
-                    u.x_f = total_act;
-                    id(modbusserver)->write_input_register(342, u.x_int[1]);
-                    id(modbusserver)->write_input_register(343, u.x_int[0]);
+                    auto write_float = [&](uint16_t reg, float value) {
+                      u.x_f = value;
+                      id(modbusserver)->write_input_register(reg, u.x_int[1]);
+                      id(modbusserver)->write_input_register(reg + 1, u.x_int[0]);
+                    };
+
+                    const float total_act_kwh = (root["total_act"] | 0.0f) / 1000.0f;
+                    const float total_act_ret_kwh = (root["total_act_ret"] | 0.0f) / 1000.0f;
+                    id(shelly_total_energy).publish_state(total_act_kwh);
+                    write_float(72, total_act_kwh);
+                    write_float(74, total_act_ret_kwh);
+                    write_float(342, total_act_kwh);
                     return true;
                   });
 
