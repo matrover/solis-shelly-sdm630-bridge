@@ -13,7 +13,7 @@ Tested with:
 - Solis S6 inverter with an Eastron/SDM630 meter port
 - Shelly Pro 3EM / EM3 with RPC endpoints
 - KinCony ESP32-S3 Core Board with onboard W5500 Ethernet and RS485
-- ESPHome 2026.4.x
+- ESPHome 2026.5.x
 
 ## Hardware
 
@@ -71,6 +71,10 @@ Important settings:
 ## Safety
 
 Do not work on wiring while the inverter or electrical cabinet is energized. RS485 is low voltage, but the meter and CT wiring are close to mains voltage. Have the mains side checked by a qualified person.
+
+## Credits
+
+This project uses the ESPHome fake Eastron/SDM630 Modbus server component from [hankipanky/esphome-fake-eastron-SDM630](https://github.com/hankipanky/esphome-fake-eastron-SDM630). Many thanks to hankipanky for making that work available.
 
 ## Documentation
 
