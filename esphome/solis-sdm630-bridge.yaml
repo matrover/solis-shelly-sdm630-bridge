@@ -4,7 +4,7 @@ substitutions:
   shelly_host: shelly-pro-3em.local
   modbus_slave_address: "1"
   power_offset_w: "0.0"
-  solis_meter_power_sign: "-1.0"
+  solis_meter_power_sign: "1.0"
 
 esphome:
   name: ${name}
